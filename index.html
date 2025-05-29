@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Crowdfunding DApp</title>
+    <!-- Load ethers.js from CDN BEFORE your app.js -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <h1>Crowdfunding DApp</h1>
+
+    <button id="connectBtn">Connect Wallet</button>
+    <div id="walletAddress"></div>
+
+    <div id="contractInfo" style="margin-top: 20px;">
+        <h3>Campaign Info</h3>
+        Goal: <span id="goal">-</span> ETH<br />
+        Raised: <span id="raised">-</span> ETH<br />
+        Contract Balance: <span id="balance">-</span> ETH<br />
+        Deadline: <span id="deadline">-</span><br />
+        Contributors: <span id="contributors">-</span><br />
+        Time Left: <span id="timeLeft">-</span><br />
+    </div>
+
+    <div id="contributionSection">
+        <h3>Contribute</h3>
+        <input type="number" id="contributionAmount" placeholder="ETH" min="0.0001" step="0.0001" />
+        <button id="contributeBtn">Contribute</button>
+    </div>
+
+    <div id="ownerSection" style="display:none;">
+        <h3>Owner Actions</h3>
+        <button id="withdrawBtn">Withdraw Funds</button>
+    </div>
+
+    <div id="refundSection" style="margin-top: 20px;">
+        <h3>Refund</h3>
+        <button id="refundBtn">Request Refund</button>
+    </div>
+
+    <!-- Your app.js script loaded AFTER ethers.js -->
+    <script src="app.js"></script>
+</body>
+</html>
