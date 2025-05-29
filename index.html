@@ -1,46 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Crowdfunding DApp</title>
-    <!-- Load ethers.js from CDN BEFORE your app.js -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <title>CrowdFund dApp</title>
+
+  <!-- ✅ Ethers.js (UMD build) -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
+    h2   { margin-top: 0; }
+    button,input { padding: .5rem 1rem; margin: .25rem 0; }
+    .muted { color: #666; font-size: .9rem; }
+    .box  { border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; }
+  </style>
 </head>
 <body>
+  <h2>CrowdFund dApp</h2>
 
-    <h1>Crowdfunding DApp</h1>
+  <!-- ❶ Connect wallet -->
+  <button id="connectBtn">Connect MetaMask</button>
+  <p id="wallet" class="muted">Wallet not connected</p>
 
-    <button id="connectBtn">Connect Wallet</button>
-    <div id="walletAddress"></div>
+  <!-- ❷ Contract info -->
+  <div class="box">
+    <h3>Campaign Info</h3>
+    <p>Goal: <strong id="goal">-</strong> ETH</p>
+    <p>Raised: <strong id="raised">-</strong> ETH</p>
+    <p>Time left: <strong id="timeLeft">-</strong></p>
+    <p class="muted">Contributors: <span id="contributors">-</span></p>
+  </div>
 
-    <div id="contractInfo" style="margin-top: 20px;">
-        <h3>Campaign Info</h3>
-        Goal: <span id="goal">-</span> ETH<br />
-        Raised: <span id="raised">-</span> ETH<br />
-        Contract Balance: <span id="balance">-</span> ETH<br />
-        Deadline: <span id="deadline">-</span><br />
-        Contributors: <span id="contributors">-</span><br />
-        Time Left: <span id="timeLeft">-</span><br />
-    </div>
+  <!-- ❸ Contribute -->
+  <div class="box">
+    <h3>Contribute</h3>
+    <input type="number" id="amount" placeholder="Amount in ETH" min="0" step="0.001">
+    <button id="contribBtn">Contribute</button>
+    <p class="muted">Your total contribution: <span id="myContribution">-</span> ETH</p>
+  </div>
 
-    <div id="contributionSection">
-        <h3>Contribute</h3>
-        <input type="number" id="contributionAmount" placeholder="ETH" min="0.0001" step="0.0001" />
-        <button id="contributeBtn">Contribute</button>
-    </div>
+  <!-- ❹ Owner withdraw -->
+  <div class="box">
+    <h3>Owner Withdrawal</h3>
+    <button id="withdrawBtn">Withdraw (owner only)</button>
+  </div>
 
-    <div id="ownerSection" style="display:none;">
-        <h3>Owner Actions</h3>
-        <button id="withdrawBtn">Withdraw Funds</button>
-    </div>
+  <!-- ❺ Public refund -->
+  <div class="box">
+    <h3>Request Refund</h3>
+    <button id="refundBtn">Refund</button>
+  </div>
 
-    <div id="refundSection" style="margin-top: 20px;">
-        <h3>Refund</h3>
-        <button id="refundBtn">Request Refund</button>
-    </div>
+  <p id="status" class="muted"></p>
 
-    <!-- Your app.js script loaded AFTER ethers.js -->
-    <script src="app.js"></script>
+<script>
+/* ---------- constants ---------- */
+const contractAddress = "0x011b24926B8af1554fa3A0cf5D24AC9d455EA9aa";
+const abi = [
+  "function goal() view returns (uint)",
+  "function raised() view returns (uint)",
+  "function deadline() view returns (uint)",
+  "function contributorCount() view returns (uint)",
+  "function contributions(address) view returns (uint)",
+  "function contribute() payable",
+  "function withdraw()",
+  "function refund()"
+];
+
+/* ---------- global vars ---------- */
+let provider, signer, contract, user;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const fmt = wei => ethers.utils.formatEther(wei);
+
+/* ---------- UI refresh ---------- */
+async function loadData() {
+  if (!contract) return;
+  try {
+    const [goal, raised, deadline, contributors, myWei] = await Promise.all([
+      contract.goal(), contract.raised(), contract.deadline(),
+      contract.contributorCount(),
+      user ? contract.contributions(user) : 0
+    ]);
+
+    $("goal").textContent = fmt(goal);
+    $("raised").textContent = fmt(raised);
+    $("contributors").textContent = contributors.toString();
+    $("myContribution").textContent = fmt(myWei);
+
+    /* time left */
+    const secLeft = Math.max(0, deadline.toNumber() - Math.floor(Date.now()/1000));
+    $("timeLeft").textContent = secLeft === 0
+      ? "Expired"
+      : `${Math.floor(secLeft/86400)}d ${Math.floor(secLeft%86400/3600)}h ${Math.floor(secLeft%3600/60)}m`;
+
+  } catch (e) {
+    console.error(e);
+    status("Error loading data");
+  }
+}
+
+/* ---------- status helper ---------- */
+function status(msg) {
+  $("status").textContent = msg;
+  console.log(msg);
+}
+
+/* ---------- connect wallet ---------- */
+async function connect() {
+  if (!window.ethereum) return alert("MetaMask not installed");
+  try {
+    await ethereum.request({ method: "eth_requestAccounts" });
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    user = await signer.getAddress();
+    $("wallet").textContent = "Connected: " + user;
+    contract = new ethers.Contract(contractAddress, abi, signer);
+
+    /* auto-refresh when blocks arrive */
+    provider.on("block", loadData);
+    await loadData();
+  } catch (e) {
+    alert("Connection failed: " + (e.data?.message || e.message));
+  }
+}
+
+/* ---------- contribute ---------- */
+async function contribute() {
+  const val = $("amount").value.trim();
+  if (!val) return alert("Enter amount");
+  try {
+    status("Sending contribution…");
+    const tx = await contract.contribute({ value: ethers.utils.parseEther(val) });
+    await tx.wait();
+    status("Contribution confirmed!");
+    $("amount").value = "";
+    await loadData();
+  } catch (e) {
+    status("Contribution failed: " + (e.data?.message || e.message));
+  }
+}
+
+/* ---------- withdraw (owner) ---------- */
+async function withdraw() {
+  try {
+    status("Withdrawing…");
+    const tx = await contract.withdraw();
+    await tx.wait();
+    status("Withdraw successful");
+    await loadData();
+  } catch (e) {
+    status("Withdraw failed: " + (e.data?.message || e.message));
+  }
+}
+
+/* ---------- refund (public) ---------- */
+async function refund() {
+  try {
+    status("Requesting refund…");
+    const tx = await contract.refund();
+    await tx.wait();
+    status("Refund successful");
+    await loadData();
+  } catch (e) {
+    status("Refund failed: " + (e.data?.message || e.message));
+  }
+}
+
+/* ---------- wire up buttons ---------- */
+$("connectBtn").onclick  = connect;
+$("contribBtn").onclick  = contribute;
+$("withdrawBtn").onclick = withdraw;
+$("refundBtn").onclick   = refund;
+
+/* show ether.js presence for debugging */
+console.log("Ethers version:", ethers.version);
+</script>
 </body>
 </html>
