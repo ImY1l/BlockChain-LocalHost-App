@@ -29,7 +29,6 @@ A simple Ethereum-based decentralized crowdfunding application.
    ```bash
    python -m http.server 8080
    ```
-4. Open [http://localhost:8080/Yous.html](http://localhost:8080/Yous.html) in your browser
-5. Use the app!!
+4. Open [http://localhost:8080/Yous.html](http://localhost:8080/Yous.html) in your browser and Use the app
 
 [![](https://visitcount.itsvg.in/api?id=imy1l&icon=0&color=0)](https://visitcount.itsvg.in)
