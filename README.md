@@ -10,7 +10,7 @@ A simple Ethereum-based decentralized crowdfunding application.
 - Displays real-time funding status, goal progress, and deadlines
 - Full MetaMask integration for wallet connection and transaction signing
 
-## 🌐 Frontend
+## 👨🏻‍🎨 Frontend
 - JavaScript, HTML, and CSS
 - Uses [Ethers.js](https://docs.ethers.org/) to interact with MetaMask and the smart contract
 - Dynamic display of Progress
