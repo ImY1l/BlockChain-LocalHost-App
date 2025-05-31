@@ -1,4 +1,4 @@
-# 💸 Decentralized Crowdfunding DApp
+# 💸 Decentralized Crowdfunding App
 A simple Ethereum-based decentralized crowdfunding application.
 
 ## 💻 Tech Stack
@@ -27,7 +27,7 @@ A simple Ethereum-based decentralized crowdfunding application.
    ```
 3. Start a local server in the project folder:
    ```bash
-   python -m http.server 8080 # or any number above 1024 and below 65535
+   python -m http.server 8080
    ```
 4. Open [http://localhost:8080/Yous.html](http://localhost:8080/Yous.html) in your browser
 5. Use the app!!
