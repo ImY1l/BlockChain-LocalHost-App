@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "0xeb2065c08eb21cc99be7b51ffcda801552250687";
+const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS";
 const CONTRACT_ABI = [
     {
         "inputs": [
