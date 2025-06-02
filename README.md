@@ -4,7 +4,7 @@ A simple Ethereum-based decentralized crowdfunding application.
 ## 💻 Tech Stack
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![Solidity](https://img.shields.io/badge/Solidity-%23363636.svg?style=for-the-badge&logo=solidity&logoColor=white)
 
-## 🔧 Features
+## 🛠️ Features
 - Tracks total raised amount and contributor count
 - Refund option if the funding goal is not met
 - Displays real-time funding status, goal progress, and deadlines
