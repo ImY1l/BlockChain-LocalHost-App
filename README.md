@@ -17,15 +17,15 @@ A simple Ethereum-based decentralized crowdfunding application.
 - Fully responsive UI
 
 ## 🚀 Run Locally
-1. Clone the repository:
+1. Clone the repository
    ```bash
    git clone https://github.com/ImY1l/Decentralized-App.git
    ```
-2. Open [`app.js`](./app.js) and change "YOUR_CONTRACT_ADDRESS" to your real address:
+2. Open [`app.js`](./app.js) and change "YOUR_CONTRACT_ADDRESS" to your real address
    ```javascript
    const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS"
    ```
-3. Start a local server in the project folder:
+3. Start a local server in the project folder
    ```bash
    python -m http.server 8080
    ```
